@@ -1,0 +1,18 @@
+{
+  "classification": {
+    "examples": 8,
+    "steps": 100,
+    "initial_training_loss": 0.5593381524085999,
+    "final_training_loss": 0.000740991672500968,
+    "training_accuracy": 1.0,
+    "note": "Training-set smoke test only; no held-out accuracy claim."
+  },
+  "instruction": {
+    "examples": 4,
+    "steps": 60,
+    "initial_training_loss": 5.593421936035156,
+    "final_training_loss": 0.07389888167381287,
+    "training_prompt_sample": "Instruction: Say hello\nResponse: Hello!",
+    "note": "Training-set smoke test only; not a general instruction-following model."
+  }
+}
