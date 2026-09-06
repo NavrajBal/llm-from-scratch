@@ -19,6 +19,7 @@ class TextClassifier(nn.Module):
         for parameter in backbone.output.parameters():
             parameter.requires_grad_(False)
         self.head = nn.Linear(backbone.config.width, classes)
+        self.train(self.training)
 
     def train(self, mode=True):
         super().train(mode)
@@ -43,7 +44,7 @@ def classification_batch(texts, tokenizer: ByteTokenizer, context_length: int):
     lengths = torch.tensor([len(ids) for ids in encoded])
     tokens = torch.full((len(encoded), int(lengths.max())), tokenizer.pad_id, dtype=torch.long)
     for row, ids in enumerate(encoded):
-        tokens[row, :len(ids)] = torch.tensor(ids)
+        tokens[row, : len(ids)] = torch.tensor(ids)
     return tokens, lengths
 
 
@@ -69,14 +70,14 @@ def instruction_batch(records, tokenizer: ByteTokenizer, context_length: int):
         response = tokenizer.encode(record["output"], add_eos=True)
         if len(prefix) > context_length:
             raise ValueError("Instruction prompt leaves no room for response targets")
-        full = (prefix + response)[:context_length + 1]
+        full = (prefix + response)[: context_length + 1]
         x, y = full[:-1], full[1:]
-        y[:len(prefix) - 1] = [-100] * (len(prefix) - 1)
+        y[: len(prefix) - 1] = [-100] * (len(prefix) - 1)
         examples.append((x, y))
     length = max(len(x) for x, _ in examples)
     inputs = torch.full((len(examples), length), tokenizer.pad_id, dtype=torch.long)
     targets = torch.full_like(inputs, -100)
     for row, (x, y) in enumerate(examples):
-        inputs[row, :len(x)] = torch.tensor(x)
-        targets[row, :len(y)] = torch.tensor(y)
+        inputs[row, : len(x)] = torch.tensor(x)
+        targets[row, : len(y)] = torch.tensor(y)
     return inputs, targets

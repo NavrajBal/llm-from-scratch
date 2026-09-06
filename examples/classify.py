@@ -26,9 +26,14 @@ def main():
     backbone = load_checkpoint(args.checkpoint)
     model = TextClassifier(backbone).train()
     texts = [
-        "Win a free prize now", "Claim your cash reward", "Click for a free gift",
-        "You won a bonus prize", "Meet me at the library", "Dinner is ready",
-        "Can you call me later", "The meeting starts at noon",
+        "Win a free prize now",
+        "Claim your cash reward",
+        "Click for a free gift",
+        "You won a bonus prize",
+        "Meet me at the library",
+        "Dinner is ready",
+        "Can you call me later",
+        "The meeting starts at noon",
     ]
     labels = torch.tensor([1, 1, 1, 1, 0, 0, 0, 0])
     tokens, lengths = classification_batch(texts, ByteTokenizer(), backbone.config.context_length)
@@ -43,13 +48,19 @@ def main():
     model.eval()
     with torch.no_grad():
         logits = model(tokens, lengths)
-        print(json.dumps({
-            "examples": len(texts), "steps": args.steps,
-            "initial_training_loss": initial_loss,
-            "final_training_loss": F.cross_entropy(logits, labels).item(),
-            "training_accuracy": (logits.argmax(-1) == labels).float().mean().item(),
-            "note": "Training-set smoke test only; no held-out accuracy claim.",
-        }, indent=2))
+        print(
+            json.dumps(
+                {
+                    "examples": len(texts),
+                    "steps": args.steps,
+                    "initial_training_loss": initial_loss,
+                    "final_training_loss": F.cross_entropy(logits, labels).item(),
+                    "training_accuracy": (logits.argmax(-1) == labels).float().mean().item(),
+                    "note": "Training-set smoke test only; no held-out accuracy claim.",
+                },
+                indent=2,
+            )
+        )
 
 
 if __name__ == "__main__":

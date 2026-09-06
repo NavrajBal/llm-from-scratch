@@ -29,9 +29,12 @@ class CausalAttention(nn.Module):
         if not 1 <= length <= self.future_mask.size(0):
             raise ValueError("Sequence length must be within the configured context")
         # [B,T,3C] -> three tensors [B,H,T,D].
-        q, k, v = self.qkv(x).reshape(
-            batch, length, 3, self.heads, self.head_dim
-        ).permute(2, 0, 3, 1, 4).unbind(0)
+        q, k, v = (
+            self.qkv(x)
+            .reshape(batch, length, 3, self.heads, self.head_dim)
+            .permute(2, 0, 3, 1, 4)
+            .unbind(0)
+        )
         scores = q @ k.transpose(-2, -1) / math.sqrt(self.head_dim)
         scores = scores.masked_fill(self.future_mask[:length, :length], float("-inf"))
         weights = self.dropout(scores.softmax(dim=-1))

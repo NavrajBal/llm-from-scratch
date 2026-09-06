@@ -45,7 +45,7 @@ class TokenWindows(Dataset):
     def __getitem__(self, index):
         start = self.starts[index]
         end = start + self.context_length
-        return self.tokens[start:end], self.tokens[start + 1:end + 1]
+        return self.tokens[start:end], self.tokens[start + 1 : end + 1]
 
 
 def split_tokens(tokens: list[int], train_fraction: float = 0.9):

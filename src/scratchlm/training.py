@@ -65,8 +65,9 @@ def save_checkpoint(model: GPT, path):
     """Save inference/transfer weights, not optimizer state for exact resumption."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({"format_version": 1, "config": asdict(model.config),
-                "model": model.state_dict()}, path)
+    torch.save(
+        {"format_version": 1, "config": asdict(model.config), "model": model.state_dict()}, path
+    )
 
 
 def load_checkpoint(path, device="cpu"):

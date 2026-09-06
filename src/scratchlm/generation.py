@@ -17,7 +17,7 @@ def generate(model, tokens, max_new_tokens=50, temperature=0.0, top_k=None, eos_
     model.eval()
     try:
         for _ in range(max_new_tokens):
-            context = tokens[:, -model.config.context_length:]
+            context = tokens[:, -model.config.context_length :]
             logits = model(context)[:, -1, :]
             if temperature == 0:
                 next_token = logits.argmax(dim=-1, keepdim=True)

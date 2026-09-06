@@ -37,12 +37,19 @@ def main():
     save_checkpoint(model, args.output)
     prompt = torch.tensor([tokenizer.encode(instruction_prompt(records[0]))])
     result = generate(model, prompt, 20, eos_id=tokenizer.eos_id)
-    print(json.dumps({
-        "examples": len(records), "steps": args.steps,
-        "initial_training_loss": before, "final_training_loss": after,
-        "training_prompt_sample": tokenizer.decode(result[0].tolist()),
-        "note": "Training-set smoke test only; not a general instruction-following model.",
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "examples": len(records),
+                "steps": args.steps,
+                "initial_training_loss": before,
+                "final_training_loss": after,
+                "training_prompt_sample": tokenizer.decode(result[0].tolist()),
+                "note": "Training-set smoke test only; not a general instruction-following model.",
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

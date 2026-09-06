@@ -3,7 +3,10 @@ import torch
 
 from scratchlm.data import ByteTokenizer
 from scratchlm.finetuning import (
-    TextClassifier, classification_batch, instruction_batch, instruction_prompt,
+    TextClassifier,
+    classification_batch,
+    instruction_batch,
+    instruction_prompt,
 )
 from scratchlm.model import GPT, GPTConfig
 from scratchlm.training import language_loss
@@ -11,11 +14,13 @@ from scratchlm.training import language_loss
 
 def test_classifier_ignores_right_padding_and_freezes_backbone():
     tokenizer = ByteTokenizer()
-    backbone = GPT(GPTConfig(width=16, heads=2, layers=1))
-    model = TextClassifier(backbone).train()
+    backbone = GPT(GPTConfig(width=16, heads=2, layers=1, dropout=0.2))
+    model = TextClassifier(backbone)
+    assert not backbone.training
+    model.train()
     x, lengths = classification_batch(["yes", "a longer message"], tokenizer, 64)
     logits = model(x, lengths)
-    single = model(x[:1, :lengths[0]], lengths[:1])
+    single = model(x[:1, : lengths[0]], lengths[:1])
     torch.testing.assert_close(logits[:1], single)
     logits.sum().backward()
     assert model.head.weight.grad is not None
@@ -32,7 +37,7 @@ def test_instruction_targets_cover_only_response_and_eos():
     x, y = instruction_batch(records, tokenizer, 80)
     for row, record in enumerate(records):
         prefix_length = len(tokenizer.encode(instruction_prompt(record)))
-        assert (y[row, :prefix_length - 1] == -100).all()
+        assert (y[row, : prefix_length - 1] == -100).all()
         assert y[row][y[row] != -100].tolist() == tokenizer.encode(record["output"], add_eos=True)
     logits = torch.randn(*x.shape, tokenizer.vocab_size, requires_grad=True)
     language_loss(logits, y).backward()
